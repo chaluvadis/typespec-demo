@@ -1,5 +1,4 @@
 @doc("This is a simple pet model")
-@example(#{ name: "Max", age: 3, kind: petType.dog })
 model Pet {
     @minLength(3)
     @maxLength(100)
@@ -13,7 +12,6 @@ model Pet {
 }
 
 @doc("This is a simple store model")
-@example(#{ name: "Abcd", address: #{ street: "abcd road", city: "xyz" } })
 model Store {
     @minLength(3)
     @maxLength(100)
