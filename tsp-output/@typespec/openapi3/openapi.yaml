@@ -37,6 +37,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
+              example:
+                name: Max
+                age: 3
+                kind: dog
         '202':
           description: The request has been accepted for processing, but processing has not yet completed.
           content:
@@ -69,6 +73,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
+              example:
+                name: Max
+                age: 23
+                kind: bird
         '404':
           description: The server cannot find the requested resource.
   /pets/{petId}:
@@ -88,6 +96,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
+              example:
+                name: Max
+                age: 23
+                kind: bird
         '404':
           description: The server cannot find the requested resource.
       requestBody:
@@ -96,6 +108,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Pet'
+            example:
+              name: Max
+              age: 23
+              kind: bird
     delete:
       operationId: Pets_deletePet
       parameters:
@@ -127,6 +143,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Store'
+              example:
+                - name: abc store
+                  address:
+                    street: 123 street
+                    city: xyz city
   /stores/{id}:
     get:
       operationId: Stores_read
@@ -143,6 +164,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Store'
+              example:
+                name: Max
+                address:
+                  street: abc street
+                  city: xyz city
 components:
   schemas:
     Address:
