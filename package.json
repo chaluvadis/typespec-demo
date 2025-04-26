@@ -9,10 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@typespec/compiler": "^0.60.0",
-    "@typespec/http": "^0.60.0",
-    "@typespec/rest": "^0.60.0",
-    "@typespec/openapi": "^0.60.0",
-    "@typespec/openapi3": "^0.60.0"
+    "@typespec/compiler": "^0.67.2",
+    "@typespec/http": "^0.67.1",
+    "@typespec/openapi": "^0.67.1",
+    "@typespec/openapi3": "^0.67.1",
+    "@typespec/protobuf": "^0.69.0",
+    "@typespec/rest": "^0.69.0"
   }
 }

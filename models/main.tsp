@@ -1,5 +1,8 @@
 @doc("This is a simple pet model")
 model Pet {
+    @visibility(Lifecycle.Read)
+    id: int32;
+
     @minLength(3)
     @maxLength(100)
     name: string;
@@ -13,6 +16,9 @@ model Pet {
 
 @doc("This is a simple store model")
 model Store {
+    @visibility(Lifecycle.Read)
+    id: int32;
+
     @minLength(3)
     @maxLength(100)
     name: string;

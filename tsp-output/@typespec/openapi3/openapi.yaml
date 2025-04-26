@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: (title)
+  title: Pet Store API
   version: 0.0.0
 tags: []
 paths:
@@ -24,7 +24,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pet'
               example:
-                - name: Max
+                - id: 123
+                  name: Max
                   age: 3
                   kind: dog
     post:
@@ -38,6 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pet'
               example:
+                id: 123
                 name: Max
                 age: 3
                 kind: dog
@@ -47,6 +49,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
       requestBody:
         required: true
         content:
@@ -54,6 +68,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Pet'
             example:
+              id: 123
               name: Max
               age: 3
               kind: dog
@@ -74,11 +89,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pet'
               example:
+                id: 123
                 name: Max
                 age: 23
                 kind: bird
         '404':
           description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
   /pets/{petId}:
     put:
       operationId: Pets_updatePet
@@ -97,11 +117,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pet'
               example:
+                id: 123
                 name: Max
                 age: 23
                 kind: bird
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         '404':
           description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
       requestBody:
         required: true
         content:
@@ -109,6 +146,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Pet'
             example:
+              id: 123
               name: Max
               age: 23
               kind: bird
@@ -144,7 +182,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Store'
               example:
-                - name: abc store
+                - id: 123
+                  name: abc store
                   address:
                     street: 123 street
                     city: xyz city
@@ -156,7 +195,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
         '200':
           description: The request has succeeded.
@@ -165,6 +205,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Store'
               example:
+                id: 123
                 name: Max
                 address:
                   street: abc street
@@ -186,13 +227,42 @@ components:
           minLength: 3
           maxLength: 100
       description: This is a simple address model
+    InternalServerError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - INTERNAL_SERVER_ERROR
+        message:
+          type: string
+    NotFoundError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - NOT_FOUND
+        message:
+          type: string
     Pet:
       type: object
       required:
+        - id
         - name
         - age
         - kind
       properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
         name:
           type: string
           minLength: 3
@@ -208,9 +278,14 @@ components:
     Store:
       type: object
       required:
+        - id
         - name
         - address
       properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
         name:
           type: string
           minLength: 3
@@ -218,6 +293,23 @@ components:
         address:
           $ref: '#/components/schemas/Address'
       description: This is a simple store model
+    ValidationError:
+      type: object
+      required:
+        - code
+        - message
+        - details
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
     petType:
       type: string
       enum:
@@ -226,3 +318,7 @@ components:
         - fish
         - bird
         - reptile
+servers:
+  - url: https://example.com
+    description: Single server endpoint
+    variables: {}
