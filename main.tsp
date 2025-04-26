@@ -1,140 +1,66 @@
 import "@typespec/http";
 import "@typespec/openapi3";
+import "@typespec/versioning";
 import "./models/main.tsp";
 import "./models/error.tsp";
+import "./models/response.tsp";
 using TypeSpec.Http;
+using TypeSpec.Versioning;
+using TypeSpec.OpenAPI;
 
 @service(#{ title: "Pet Store API" })
 @server("https://example.com", "Single server endpoint")
+@versioned(Versions)
 namespace PetStore {
+    enum Versions {
+        v1: "1.0.0",
+    }
     @route("/pets")
     interface Pets {
         @get
-        @opExample(#{
-            parameters: #{ filter: "Max" },
-            returnType: #{
-                statusCode: 200,
-                pets: #[#{ id: 123, name: "Max", age: 3, kind: petType.dog }],
-            },
-        })
-        getAllPets(@query filter: string): {
-            @statusCode statusCode: 200;
-            @body pets: Pet[];
-        };
+        getAllPets(@query filter: string): PetListResponse;
+        @get
+        getPetById(
+            @path id: string,
+        ): PetResponse | PetUnauthorizedResponse | PetNotFoundResponse;
 
         @post
-        @opExample(#{
-            parameters: #{
-                pet: #{ id: 123, name: "Max", age: 3, kind: petType.dog },
-            },
-            returnType: #{
-                statusCode: 201,
-                pet: #{ id: 123, name: "Max", age: 3, kind: petType.dog },
-            },
-        })
+        @useAuth(BearerAuth)
         create(@body pet: Pet):
-            | {
-                  @statusCode statusCode: 201;
-                  @body pet: Pet;
-              }
-            | {
-                  @statusCode statusCode: 202;
-                  @body pet: Pet;
-              }
-            | {
-                  @statusCode statusCode: 400;
-                  @body error: ValidationError;
-              }
-            | {
-                  @statusCode statusCode: 500;
-                  @body error: InternalServerError;
-              };
-
-        @get
-        @opExample(#{
-            parameters: #{ id: "3" },
-            returnType: #{
-                statusCode: 200,
-                pet: #{ id: 123, name: "Max", age: 23, kind: petType.bird },
-            },
-        })
-        getPetById(@path id: string): {
-            @statusCode statusCode: 200;
-            @body pet: Pet;
-        } | {
-            @statusCode statusCode: 404;
-            @body error: NotFoundError;
-        };
+            | PetCreatedResponse
+            | PetAcceptedResponse
+            | PetErrorResponse
+            | PetUnauthorizedResponse
+            | InternalServerErrorResponse;
 
         @put
-        @opExample(#{
-            parameters: #{
-                petId: 3,
-                pet: #{ id: 123, name: "Max", age: 23, kind: petType.bird },
-            },
-            returnType: #{
-                statusCode: 200,
-                pet: #{ id: 123, name: "Max", age: 23, kind: petType.bird },
-            },
-        })
+        @useAuth(BearerAuth)
         updatePet(@path petId: int32, @body pet: Pet):
-            | {
-                  @statusCode statusCode: 200;
-                  @body pet: Pet;
-              }
-            | {
-                  @statusCode statusCode: 404;
-                  @body error: ValidationError;
-              }
-            | {
-                  @statusCode statusCode: 400;
-                  @body error: ValidationError;
-              }
-            | {
-                  @statusCode statusCode: 500;
-                  @body error: InternalServerError;
-              };
+            | PetResponse
+            | PetErrorResponse
+            | PetUnauthorizedResponse
+            | PetNotFoundResponse
+            | InternalServerErrorResponse;
 
         @delete
+        @useAuth(BearerAuth)
         @opExample(#{
             parameters: #{ petId: 3 },
             returnType: #{ statusCode: 204 },
         })
-        deletePet(@path petId: int32): {
-            @statusCode statusCode: 204;
-        };
+        deletePet(@path petId: int32):
+            | PetResponse
+            | PetNotFoundResponse
+            | PetNoContentResponse
+            | PetUnauthorizedResponse;
     }
 
     @route("/stores")
     interface Stores {
         @get
-        @opExample(#{
-            parameters: #{ filter: "Max" },
-            returnType: #{
-                statusCode: 200,
-                stores: #[
-                    #{
-                        id: 123,
-                        name: "abc store",
-                        address: #{ street: "123 street", city: "xyz city" },
-                    }
-                ],
-            },
-        })
-        list(@query filter: string): {
-            @statusCode statusCode: 200;
-            @body stores: Store[];
-        };
+        list(@query filter: string): StoreListResponse;
 
         @get
-        @opExample(#{
-            parameters: #{ id: 3 },
-            returnType: #{
-                id: 123,
-                name: "Max",
-                address: #{ street: "abc street", city: "xyz city" },
-            },
-        })
-        read(@path id: int32): Store;
+        read(@path id: int32): StoreResponse | StoreNotFoundResponse;
     }
 }
